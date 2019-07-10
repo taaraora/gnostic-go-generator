@@ -39,6 +39,8 @@ func main() {
 	// Use the name used to run the plugin to decide which files to generate.
 	var files []string
 	switch {
+	case strings.Contains(env.Invocation, "gnostic-go-types"):
+		files = []string{"types.go", "constants.go"}
 	case strings.Contains(env.Invocation, "gnostic-go-client"):
 		files = []string{"client.go", "types.go", "constants.go"}
 	case strings.Contains(env.Invocation, "gnostic-go-server"):
