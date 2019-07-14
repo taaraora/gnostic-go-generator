@@ -13,3 +13,7 @@ test:
 	pushd examples/v2.0/sample && make test && popd
 	pushd examples/v2.0/bookstore && make test && popd
 	pushd examples/v3.0/bookstore && make test && popd
+
+
+dev-test: build
+	gnostic accounts.yaml --go-generator-out=bookstore

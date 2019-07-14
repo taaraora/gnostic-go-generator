@@ -1,0 +1,778 @@
+openapi: 3.0.1
+info:
+  title: Accounts Service API
+  version: v0.0.1
+  description: |
+    Accounts Service provides:
+      1. IdP functionality (user sign up, user log in, password reset flow, etc...)
+      2. Users and Accounts REST API
+servers:
+  - url: /api/v1
+paths:
+  /accounts:
+    get:
+      description: returns list of accounts
+      operationId: getAccounts
+      responses:
+        '200':
+          description: no error
+          content:
+            application/json:
+              schema:
+                type: array
+                description: all accounts in the system
+                items:
+                  $ref: '#/components/schemas/account'
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+      x-rbac-feature:
+        - accounts_reading
+        - accounts_modification
+    post:
+      description: create account only for backoffice, usually account is created on signup
+      operationId: createAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/account'
+        required: true
+      responses:
+        '201':
+          description: account is created
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  /accounts/{accountId}:
+    get:
+      description: returns details of an account
+      operationId: getAccount
+      parameters:
+        - name: accountId
+          in: path
+          description: The id of the account to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: no error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/account'
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    patch:
+      description: patch account
+      operationId: patchAccount
+      parameters:
+        - name: accountId
+          in: path
+          description: The id of the account to patch
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/account'
+        required: true
+      responses:
+        '200':
+          description: account is patched
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  /accounts/{accountId}/users:
+    get:
+      description: returns list of users on the account
+      operationId: getAccountUsers
+      parameters:
+        - name: accountId
+          in: path
+          description: The accountID to which to pull users from
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: no error
+          content:
+            application/json:
+              schema:
+                type: array
+                description: all users on the account
+                items:
+                  $ref: '#/components/schemas/user'
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    post:
+      description: create user for account
+      operationId: createAccountUser
+      parameters:
+        - name: accountId
+          in: path
+          description: The accountID to which to pull users from
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+        required: true
+      responses:
+        '201':
+          description: user is created
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  /users:
+    get:
+      description: returns list of users
+      operationId: getUsers
+      responses:
+        '200':
+          description: no error
+          content:
+            application/json:
+              schema:
+                type: array
+                description: all users in the system
+                items:
+                  $ref: '#/components/schemas/user'
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+      x-rbac-feature:
+        - users_reading
+        - users_modification
+  /users/{userId}:
+    get:
+      description: returns details of the user
+      operationId: getUser
+      parameters:
+        - name: userId
+          in: path
+          description: The id of the user to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: no error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    delete:
+      description: deletes user
+      operationId: deleteUser
+      parameters:
+        - name: userId
+          in: path
+          description: The id of the user to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: user is deleted
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    patch:
+      description: patch users properties except password, for password change see  ` /password` endpoint
+      operationId: patchUser
+      parameters:
+        - name: userId
+          in: path
+          description: The id of the user to patch
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+        required: true
+      responses:
+        '200':
+          description: user is patched
+        '403':
+          description: forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /signup:
+    post:
+      description: user signup process
+      operationId: signup
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - company
+                - name
+                - email
+                - password
+                - newsSubscription
+              properties:
+                company:
+                  maxLength: 255
+                  type: string
+                  description: Company the account belongs to
+                name:
+                  maxLength: 255
+                  type: string
+                  description: first name and last name of user
+                email:
+                  type: string
+                  description: the email of the user
+                  format: email
+                password:
+                  type: string
+                  description: password for the user
+                  format: password
+                newsSubscription:
+                  type: boolean
+                  description: |
+                    We periodically send feature updates, optimization recommendations, and in-depth tutorials.
+                    Would you like to receive these?
+        required: true
+      responses:
+        '200':
+          description: signup process is started
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  /verify/{tokenId}:
+    get:
+      description: verifies a users email address using sent token. Intended to be called from email received by user.
+      operationId: verifyToken
+      parameters:
+        - name: tokenId
+          in: path
+          description: tokenId for verification
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: token is not expired and email has been verified
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  /users/available:
+    get:
+      description: checks to see if an email already has an associated user entry
+      operationId: isEmailAvailable
+      responses:
+        '200':
+          description: email is available
+        '409':
+          description: conflict.  email is in use
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /sessions:
+    post:
+      description: Performs users log in. If email and password match, generate JWT token.
+      operationId: login
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: the email of the user
+                  format: email
+                password:
+                  type: string
+                  description: password for the user
+                  format: password
+        required: true
+      responses:
+        '201':
+          description: user logged in and JWT token passed back
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        '422':
+          description: credentilas check is failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '403':
+          description: user is not allowed to log in due to being suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    delete:
+      description: revokes JWT thus logging user out
+      operationId: logout
+      responses:
+        '200':
+          description: logged out successfully
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+  /sessions/refresh:
+    get:
+      description: Refreshes JWT token. Gets a minty fresh JWT from server.
+      operationId: refreshSession
+      responses:
+        '201':
+          description: token refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /password/reset:
+    get:
+      description: |
+        Starts password reset flow.
+        Probably password reset flow is to send email with temporary token to user so one can reset password
+      operationId: requestPasswordReset
+      parameters:
+        - name: email
+          in: query
+          description: email to send request to
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        '200':
+          description: we will send okay 200 regardless of it went successfully or not.  This is for security reasons
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    post:
+      description: using this endpoint user can change his password using temporary JWT token having recevied it by email without knowing the old password
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - idToken
+                - newPassword
+              properties:
+                idToken:
+                  type: string
+                  description: temporary idToken for password resetting
+                newPassword:
+                  type: string
+                  description: new password for the user
+                  format: password
+        required: true
+      responses:
+        '200':
+          description: password has been changed successful
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+
+  /password:
+    post:
+      description: using this endpoint authenticated user can change the one password
+      operationId: changePassword
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                  description: current password for the user
+                newPassword:
+                  type: string
+                  description: new password for the user
+                  format: password
+        required: true
+      responses:
+        '200':
+          description: password has been changed successful
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+
+
+  /healthz:
+    get:
+      description: |
+        It is not only http server check. This endpoint should show overall application health status. It can invoke
+        1. functional tests or smoke tests
+        2. integration checks
+        3. database/storage checks
+        it defenetly should return metadata to help ops troubleshoot app and should be used for readiness checks
+        E.g. Which subsytem of App is not healty, pod name, ns, address, etc...
+      operationId: healthCheck
+      # TODO: design responce
+      responses:
+        '200':
+          description: it is healthy
+        '500':
+          description: it is not healthy
+        default:
+          description: error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+
+
+components:
+  schemas:
+    errorResponse:
+      required:
+        - message
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int64
+        message:
+          type: string
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          description: user unique identifier
+        createdAt:
+          type: string
+          description: user creation timestamp
+          format: date-time
+        updatedAt:
+          type: string
+          description: user update timestamp
+          format: date-time
+        suspended:
+          type: boolean
+          description: if true user can't login and spin up clusters
+        name:
+          maxLength: 255
+          type: string
+          description: first name and last name of user
+        email:
+          type: string
+          description: the email of the user
+          format: email
+        verified:
+          type: boolean
+          description: user's email has been verified
+        password:
+          type: string
+          description: password for the user
+          format: password
+        verificationToken:
+          type: string
+          description: The token used to verify the user's email.
+        verificationTokenGeneratedAt:
+          type: string
+          description: Time stamp in which the token was generated
+          format: date-time
+        lastLoggedInAt:
+          type: string
+          description: Time stamp in which the user successfully logged into the account
+          format: date-time
+        lastLoggedOutAt:
+          type: string
+          description: Time stamp in which the user log out of the account
+          format: date-time
+        lastLoggedInIP:
+          type: string
+          description: IP with which user logged in last time
+        failedLogInIP:
+          type: string
+          description: last IP with which user failed to log in
+        failedLogInCount:
+          minimum: 0
+          type: integer
+          description: Total count of times to which user failed to log in
+        roleIDs:
+          type: array
+          description: List of role IDs to which user is assigned to
+          items:
+            type: string
+        jobTitle:
+          maxLength: 255
+          type: string
+          description: The job that is held by the user
+        location:
+          maxLength: 255
+          type: string
+          description: City and State of user
+        phoneNumber:
+          maxLength: 255
+          type: string
+          description: the phone number for the user
+    account:
+      type: object
+      properties:
+        id:
+          type: string
+          description: account unique identifier
+        createdAt:
+          type: string
+          description: account creation timestamp
+          format: date-time
+        updatedAt:
+          type: string
+          description: account update timestamp
+          format: date-time
+        suspended:
+          type: boolean
+          description: if true users from this account can't login and spin up clusters
+        dpaStatus:
+          type: string
+          description: |
+            status of data processing agreement document which should be signed between two data processing actors under GDPR
+            - requestAction - the user hasen't interacted with the banner
+            - pending - they are waiting on up to sign the DPA
+            - exempt - the user selected that they are exempt from the DPA requirement
+            - received - we have a DPA from this account signed by us and them
+          enum:
+            - requestAction
+            - pending
+            - exempt
+            - received
+        dpaUpdatedAt:
+          type: string
+          description: last update timestamp of dpaStatus field
+          format: date-time
+        company:
+          maxLength: 255
+          type: string
+          description: Company the account belongs to
+        email:
+          type: string
+          description: The company wide email for the account.  Up for debate on if
+            we keep this variable
+          format: email
+    token:
+      type: object
+      properties:
+        idToken:
+          type: string
+          description: JWT token
+      required:
+        - idToken
