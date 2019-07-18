@@ -53,7 +53,34 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 
 func jsonTag(field *surface.Field) string {
 	if field.Serialize {
-		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
+		return addDbTags(field)
 	}
 	return ""
+}
+func addDbTags(field *surface.Field) string {
+	var i []rune
+	flag := true
+	counter := 0
+	for k, v := range field.Name {
+		var lower = false
+		if (v <= 65 || v <= 90) && k != 0 {
+			flag = false
+			lower = true
+			counter ++
+			if counter < 2 {
+				i = append(i, 95)
+			}
+		}
+		if lower {
+			i = append(i, v+32)
+		} else {
+			counter = 0
+			i = append(i, v)
+		}
+	}
+	if flag {
+		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
+	} else {
+		return " `json:" + `"` + field.Name + `,omitempty"` + ` db:` + string(i) + "`"
+	}
 }
