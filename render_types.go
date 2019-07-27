@@ -58,29 +58,29 @@ func jsonTag(field *surface.Field) string {
 	return ""
 }
 func addDbTags(field *surface.Field) string {
-	var i []rune
-	flag := true
+	var tagComponents []rune
+	tagPresence := true
 	counter := 0
 	for k, v := range field.Name {
 		var lower = false
 		if (v <= 65 || v <= 90) && k != 0 {
-			flag = false
+			tagPresence = false
 			lower = true
-			counter ++
+			counter++
 			if counter < 2 {
-				i = append(i, 95)
+				tagComponents = append(tagComponents, 95)
 			}
 		}
 		if lower {
-			i = append(i, v+32)
+			tagComponents = append(tagComponents, v+32)
 		} else {
 			counter = 0
-			i = append(i, v)
+			tagComponents = append(tagComponents, v)
 		}
 	}
-	if flag {
+	if tagPresence {
 		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
 	} else {
-		return " `json:" + `"` + field.Name + `,omitempty"` + ` db:` + string(i) + "`"
+		return " `json:" + `"` + field.Name + `,omitempty"` + ` db:` + string(tagComponents) + "`"
 	}
 }
