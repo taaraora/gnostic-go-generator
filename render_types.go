@@ -80,7 +80,6 @@ func addDbTags(field *surface.Field) string {
 	}
 	if tagPresence {
 		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
-	} else {
-		return " `json:" + `"` + field.Name + `,omitempty"` + ` db:` + string(tagComponents) + "`"
 	}
+	return " `json:" + `"` + field.Name + `,omitempty"` + ` db:` + string(tagComponents) + "`"
 }
