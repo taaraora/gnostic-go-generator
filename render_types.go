@@ -39,7 +39,7 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 				} else if field.Kind == surface.FieldKind_ANY {
 					typ = "interface{}"
 				}
-				f.WriteLine(field.FieldName + ` ` + typ + structTagGenerate(jsonTag(field), dbTag(field)))
+				f.WriteLine(field.FieldName + ` ` + typ + structTagGenerate(JsonTag(field), dbTag(field)))
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.TypeKind_OBJECT {
@@ -53,29 +53,41 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 
 func structTagGenerate(tags ...string) string {
 	var name string
-	for k,v := range tags{
-		if tags[0] != "" {
-			if k != len(tags)-1 && len(tags) != 1 && v[len(v)-1] == 96 && tags[len(tags)-1] != "" {
-				name += v[:len(v)-1]
-			} else {
-				name += v
-			}
-		}
+	if len(tags) == 0 || tags[0] == "" {
+		return name
 	}
-	return name
+
+	structTag := "` "
+	for i, tag := range tags {
+		structTag += tag
+		if i == len(tags) - 1 {
+			continue
+		}
+		structTag += " "
+	}
+	structTag += "`"
+
+	return structTag
 }
 
 
-func jsonTag(field *surface.Field) string {
-	if field.Serialize && field.Name != "" {
-		if field.Name[0] <= 65 || field.Name[0] <= 90{
-			field.Name = string(field.Name[0]+32) + field.Name[1:]
-		}
-		return "`json:" + `"` + field.Name + `,omitempty"` + "`"
+func JsonTag(field *surface.Field) string {
+	if !field.Serialize || field.Name == "" {
+		return ""
 	}
 
-	return ""
+	if startsFormCapital(field.Name) {
+		field.Name = string(field.Name[0]+32) + field.Name[1:]
+	}
+
+	return "`json:" + `"` + field.Name + `,omitempty"` + "`"
 }
+
+func startsFormCapital(str string) bool {
+	return str[0] <= 65 || str[0] <= 90
+}
+
+
 
 func dbTag(field *surface.Field) string {
 	var tagComponents []rune
