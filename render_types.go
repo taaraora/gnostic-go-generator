@@ -39,7 +39,7 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 				} else if field.Kind == surface.FieldKind_ANY {
 					typ = "interface{}"
 				}
-				f.WriteLine(field.FieldName + ` ` + typ + jsonTag(field))
+				f.WriteLine(field.FieldName + ` ` + typ + structTagGenerate(jsonTag(field), dbTag(field)))
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.TypeKind_OBJECT {
@@ -51,9 +51,55 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 	return f.Bytes(), nil
 }
 
-func jsonTag(field *surface.Field) string {
-	if field.Serialize {
-		return " `json:" + `"` + field.Name + `,omitempty"` + "`"
+func structTagGenerate(tags ...string) string {
+	var name string
+	for k,v := range tags{
+		if tags[0] != "" {
+			if k != len(tags)-1 && len(tags) != 1 && v[len(v)-1] == 96 && tags[len(tags)-1] != "" {
+				name += v[:len(v)-1]
+			} else {
+				name += v
+			}
+		}
 	}
+	return name
+}
+
+
+func jsonTag(field *surface.Field) string {
+	if field.Serialize && field.Name != "" {
+		if field.Name[0] <= 65 || field.Name[0] <= 90{
+			field.Name = string(field.Name[0]+32) + field.Name[1:]
+		}
+		return "`json:" + `"` + field.Name + `,omitempty"` + "`"
+	}
+
 	return ""
+}
+
+func dbTag(field *surface.Field) string {
+	var tagComponents []rune
+	var numberOfWords bool
+	counter := 0
+	for k, v := range field.Name {
+		var lower = false
+		if v <= 65 || v <= 90 {
+			numberOfWords = true
+			lower = true
+			counter++
+			if counter < 2 && k !=0 {
+				tagComponents = append(tagComponents, 95)
+			}
+		}
+		if lower {
+			tagComponents = append(tagComponents, v+32)
+		} else {
+			counter = 0
+			tagComponents = append(tagComponents, v)
+		}
+	}
+	if !numberOfWords {
+		return ""
+	}
+	return ` db:` + `"` + string(tagComponents) + `"`+"`"
 }
