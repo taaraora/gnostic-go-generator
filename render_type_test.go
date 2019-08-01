@@ -17,6 +17,13 @@ func Test_JsonTag(t *testing.T) {
 		},
 		{
 			field: surface.Field{
+				Name:      `DPaStatus`,
+				Serialize: true,
+			},
+			result: `json:"dPaStatus,omitempty"`,
+		},
+		{
+			field: surface.Field{
 				Name:      ``,
 				Serialize: true,
 			},
@@ -44,7 +51,7 @@ func Test_DbTeg(t *testing.T) {
 	}{
 		{
 			field: surface.Field{
-				Name: `DpaStatus`,
+				Name: `DPaStatus`,
 			},
 			result: `db:"dpa_status"`,
 		},
@@ -71,32 +78,28 @@ func Test_DbTeg(t *testing.T) {
 
 func Test_StructTagGenerate(t *testing.T) {
 	data := []struct {
-		testTagOne   string
-		testTagTwo   string
-		testTagThree string
+
+		tags [] string
 		result       string
 	}{
-		{
-			testTagOne:   `json:"createdAt,omitempty"`,
-			testTagTwo:   `json:"updatedAt,omitempty"`,
-			testTagThree: `json:"verificationToken,omitempty"`,
-			result:       "`"+` json:"createdAt,omitempty" json:"updatedAt,omitempty" json:"verificationToken,omitempty"`+"`",
+		{	tags: []string {`json:"createdAt,omitempty"`, `db:"updatedAt"`, `json:"verificationToken,omitempty"`},
+			result:       "`"+`json:"createdAt,omitempty" db:"updatedAt" json:"verificationToken,omitempty"`+"`",
 		},
 		{
-			testTagOne:   `json:"createdAt,omitempty"`,
-			testTagTwo:   `json:"updatedAt,omitempty"`,
-			testTagThree: ``,
-			result:       "`"+` json:"createdAt,omitempty" json:"updatedAt,omitempty" `+"`",
+			tags: []string {`json:"createdAt,omitempty"`, `json:"updatedAt,omitempty"`, ``},
+			result:       "`"+`json:"createdAt,omitempty" json:"updatedAt,omitempty"`+"`",
 		},
 		{
-			testTagOne:   `json:"createdAt,omitempty"`,
-			testTagTwo:   ``,
-			testTagThree: ``,
-			result:       "`"+` json:"createdAt,omitempty"  `+"`",
+			tags: []string {`json:"createdAt,omitempty"`, ``, ``},
+			result:       "`"+`json:"createdAt,omitempty"`+"`",
+		},
+		{
+			tags: []string {`json:"createdAt,omitempty"`},
+			result:       "`"+`json:"createdAt,omitempty"`+"`",
 		},
 	}
 	for _, testCase := range data {
-		res := structTagGenerate(testCase.testTagOne, testCase.testTagTwo, testCase.testTagThree)
+		res := structTagGenerate(testCase.tags...)
 		if res != testCase.result {
 			t.Fatalf("expected %v, got %v", testCase.result, res)
 		}

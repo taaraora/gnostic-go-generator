@@ -58,13 +58,12 @@ func structTagGenerate(tags ...string) string {
 		return name
 	}
 
-	structTag := "` "
+	structTag := "`"
 	for i, tag := range tags {
-		structTag += tag
-		if i == len(tags)-1 {
-			continue
+		if i != 0 && tag != "" {
+			structTag += " "
 		}
-		structTag += " "
+		structTag += tag
 	}
 	structTag += "`"
 
@@ -76,22 +75,47 @@ func jsonTag(field *surface.Field) string {
 		return ""
 	}
 
-	if startsFormCapital(field.Name) {
-		field.Name = string(field.Name[0]+32) + field.Name[1:]
-	}
-
-	return "json:" + `"` + field.Name + `,omitempty"`
+	return "json:" + `"` + toCamelCase(field.Name) + `,omitempty"`
 }
-
-func startsFormCapital(str string) bool {
-	return str[0] <= 65 || str[0] <= 90
-}
-
-func dbTag(field *surface.Field) string {
+func toCamelCase(field string) string {
 	var tagComponents []rune
 	var numberOfWords bool
 	counter := 0
-	for k, v := range field.Name {
+	for k, v := range field {
+		var lower = false
+		if v <= 65 || v <= 90 {
+			numberOfWords = true
+			lower = true
+			counter++
+			if counter < 2 && k != 0 || k==1{
+				tagComponents = append(tagComponents,v)
+				continue
+			}
+		}
+		if lower {
+			tagComponents = append(tagComponents, v+32)
+		} else {
+			counter = 0
+			tagComponents = append(tagComponents, v)
+		}
+	}
+	if !numberOfWords {
+		return ""
+	}
+	return string(tagComponents)
+}
+
+func dbTag(field *surface.Field) string {
+	if toSnakeCase(field.Name) ==""{
+		return ""
+	}
+	return `db:` + `"` + toSnakeCase(field.Name) + `"`
+}
+func toSnakeCase(field string)string{
+	var tagComponents []rune
+	var numberOfWords bool
+	counter := 0
+	for k, v := range field {
 		var lower = false
 		if v <= 65 || v <= 90 {
 			numberOfWords = true
@@ -111,5 +135,5 @@ func dbTag(field *surface.Field) string {
 	if !numberOfWords {
 		return ""
 	}
-	return `db:` + `"` + string(tagComponents) + `"`
+	return string(tagComponents)
 }
