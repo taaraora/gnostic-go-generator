@@ -39,7 +39,8 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 				} else if field.Kind == surface.FieldKind_ANY {
 					typ = "interface{}"
 				}
-				f.WriteLine(field.FieldName + ` ` + typ + structTagGenerate(JsonTag(field), dbTag(field)))
+
+				f.WriteLine(field.FieldName + ` ` + typ + structTagGenerate(jsonTag(field), dbTag(field)))
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.TypeKind_OBJECT {
@@ -60,7 +61,7 @@ func structTagGenerate(tags ...string) string {
 	structTag := "` "
 	for i, tag := range tags {
 		structTag += tag
-		if i == len(tags) - 1 {
+		if i == len(tags)-1 {
 			continue
 		}
 		structTag += " "
@@ -70,8 +71,7 @@ func structTagGenerate(tags ...string) string {
 	return structTag
 }
 
-
-func JsonTag(field *surface.Field) string {
+func jsonTag(field *surface.Field) string {
 	if !field.Serialize || field.Name == "" {
 		return ""
 	}
@@ -80,14 +80,12 @@ func JsonTag(field *surface.Field) string {
 		field.Name = string(field.Name[0]+32) + field.Name[1:]
 	}
 
-	return "`json:" + `"` + field.Name + `,omitempty"` + "`"
+	return "json:" + `"` + field.Name + `,omitempty"`
 }
 
 func startsFormCapital(str string) bool {
 	return str[0] <= 65 || str[0] <= 90
 }
-
-
 
 func dbTag(field *surface.Field) string {
 	var tagComponents []rune
@@ -99,7 +97,7 @@ func dbTag(field *surface.Field) string {
 			numberOfWords = true
 			lower = true
 			counter++
-			if counter < 2 && k !=0 {
+			if counter < 2 && k != 0 {
 				tagComponents = append(tagComponents, 95)
 			}
 		}
@@ -113,5 +111,5 @@ func dbTag(field *surface.Field) string {
 	if !numberOfWords {
 		return ""
 	}
-	return ` db:` + `"` + string(tagComponents) + `"`+"`"
+	return `db:` + `"` + string(tagComponents) + `"`
 }
