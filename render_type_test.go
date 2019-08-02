@@ -5,33 +5,33 @@ import "testing"
 
 func Test_JsonTag(t *testing.T) {
 	data := []struct {
-		a      surface.Field
+		field  surface.Field
 		result string
 	}{
 		{
-			a: surface.Field{
+			field: surface.Field{
 				Name:      `DpaStatus`,
 				Serialize: true,
 			},
 			result: `json:"dpaStatus,omitempty"`,
 		},
 		{
-			a: surface.Field{
+			field: surface.Field{
 				Name:      ``,
 				Serialize: true,
 			},
 			result: ``,
 		},
 		{
-			a: surface.Field{
-				Name:      ``,
+			field: surface.Field{
+				Name:      `DpaStatus`,
 				Serialize: false,
 			},
 			result: ``,
 		},
 	}
 	for _, testCase := range data {
-		res := jsonTag(&testCase.a)
+		res := jsonTag(&testCase.field)
 		if res != testCase.result {
 			t.Fatalf("expected %v, got %v", testCase.result, res)
 		}
@@ -39,30 +39,30 @@ func Test_JsonTag(t *testing.T) {
 }
 func Test_DbTeg(t *testing.T) {
 	data := []struct {
-		a      surface.Field
+		field  surface.Field
 		result string
 	}{
 		{
-			a: surface.Field{
+			field: surface.Field{
 				Name: `DpaStatus`,
 			},
 			result: `db:"dpa_status"`,
 		},
 		{
-			a: surface.Field{
-				Name: `dpaSTatus`,
+			field: surface.Field{
+				Name: `lastLoggedInIP`,
 			},
-			result: `db:"dpa_status"`,
+			result: `db:"last_logged_in_ip"`,
 		},
 		{
-			a: surface.Field{
+			field: surface.Field{
 				Name: ``,
 			},
 			result: ``,
 		},
 	}
 	for _, testCase := range data {
-		res := dbTag(&testCase.a)
+		res := dbTag(&testCase.field)
 		if res != testCase.result {
 			t.Fatalf("expected %v, got %v.", testCase.result, res)
 		}
@@ -71,32 +71,32 @@ func Test_DbTeg(t *testing.T) {
 
 func Test_StructTagGenerate(t *testing.T) {
 	data := []struct {
-		testStrOne  string
-		testStrTwo  string
-		testStrThre string
-		result      string
+		testTagOne   string
+		testTagTwo   string
+		testTagThree string
+		result       string
 	}{
 		{
-			testStrOne:  `String one,`,
-			testStrTwo:  `String two,`,
-			testStrThre: `String three.`,
-			result:      "` String one, String two, String three.`",
+			testTagOne:   `json:"createdAt,omitempty"`,
+			testTagTwo:   `json:"updatedAt,omitempty"`,
+			testTagThree: `json:"verificationToken,omitempty"`,
+			result:       "`"+` json:"createdAt,omitempty" json:"updatedAt,omitempty" json:"verificationToken,omitempty"`+"`",
 		},
 		{
-			testStrOne:  `String one,`,
-			testStrTwo:  `String two.`,
-			testStrThre: ``,
-			result:      "` String one, String two. `",
+			testTagOne:   `json:"createdAt,omitempty"`,
+			testTagTwo:   `json:"updatedAt,omitempty"`,
+			testTagThree: ``,
+			result:       "`"+` json:"createdAt,omitempty" json:"updatedAt,omitempty" `+"`",
 		},
 		{
-			testStrOne:  `String one`,
-			testStrTwo:  ``,
-			testStrThre: ``,
-			result:      "` String one  `",
+			testTagOne:   `json:"createdAt,omitempty"`,
+			testTagTwo:   ``,
+			testTagThree: ``,
+			result:       "`"+` json:"createdAt,omitempty"  `+"`",
 		},
 	}
 	for _, testCase := range data {
-		res := structTagGenerate(testCase.testStrOne, testCase.testStrTwo, testCase.testStrThre)
+		res := structTagGenerate(testCase.testTagOne, testCase.testTagTwo, testCase.testTagThree)
 		if res != testCase.result {
 			t.Fatalf("expected %v, got %v", testCase.result, res)
 		}
