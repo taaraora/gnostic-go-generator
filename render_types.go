@@ -58,13 +58,12 @@ func structTagGenerate(tags ...string) string {
 		return name
 	}
 
-	structTag := "` "
+	structTag := "`"
 	for i, tag := range tags {
-		structTag += tag
-		if i == len(tags)-1 {
-			continue
+		if i != 0 && tag != "" {
+			structTag += " "
 		}
-		structTag += " "
+		structTag += tag
 	}
 	structTag += "`"
 
