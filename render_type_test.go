@@ -17,6 +17,13 @@ func Test_JsonTag(t *testing.T) {
 		},
 		{
 			field: surface.Field{
+				Name:      `DPaStatus`,
+				Serialize: true,
+			},
+			result: `json:"dPaStatus,omitempty"`,
+		},
+		{
+			field: surface.Field{
 				Name:      ``,
 				Serialize: true,
 			},
