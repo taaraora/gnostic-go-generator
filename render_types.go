@@ -79,12 +79,10 @@ func jsonTag(field *surface.Field) string {
 }
 func toCamelCase(field string) string {
 	var tagComponents []rune
-	var numberOfWords bool
 	counter := 0
 	for k, v := range field {
 		var lower = false
 		if v <= 65 || v <= 90 {
-			numberOfWords = true
 			lower = true
 			counter++
 			if counter < 2 && k != 0 || k==1{
@@ -98,9 +96,6 @@ func toCamelCase(field string) string {
 			counter = 0
 			tagComponents = append(tagComponents, v)
 		}
-	}
-	if !numberOfWords {
-		return ""
 	}
 	return string(tagComponents)
 }

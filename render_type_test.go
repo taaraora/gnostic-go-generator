@@ -51,7 +51,7 @@ func Test_DbTeg(t *testing.T) {
 	}{
 		{
 			field: surface.Field{
-				Name: `DPaStatus`,
+				Name: `DpaStatus`,
 			},
 			result: `db:"dpa_status"`,
 		},

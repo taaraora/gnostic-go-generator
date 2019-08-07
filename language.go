@@ -55,6 +55,9 @@ func (language *GoLanguageModel) Prepare(model *surface.Model) {
 				f.NativeType = "interface{}"
 			case "string":
 				f.NativeType = "string"
+				// TODO: it looks more like spotfix
+			case "map[string]string":
+				f.NativeType = "string"
 			default:
 				f.NativeType = strings.Title(filteredTypeName(f.Type))
 			}
