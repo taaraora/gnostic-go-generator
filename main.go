@@ -46,7 +46,7 @@ func main() {
 	case strings.Contains(env.Invocation, "gnostic-go-server"):
 		files = []string{"server.go", "provider.go", "types.go", "constants.go"}
 	default:
-		files = []string{"client.go", "server.go", "provider.go", "types.go", "constants.go"}
+		files = []string{"client.go", "server.go", "provider.go", "types.go", "constants.go", "events_consts.go"}
 	}
 
 	for _, model := range env.Request.Models {
