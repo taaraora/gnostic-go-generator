@@ -53,7 +53,7 @@ func (renderer *Renderer) Render(response *plugins.Response, files []string) (er
 		case "constants.go":
 			file.Data, err = renderer.RenderConstants()
 		case "events_consts.go":
-			file.Data, err = renderer.RenderEvent_consts()
+			file.Data, err = renderer.Render_event_consts()
 		default:
 			file.Data = nil
 		}
