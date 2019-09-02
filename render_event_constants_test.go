@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"testing"
 )
 
@@ -18,12 +17,16 @@ func Test_splitLineConstants(t *testing.T) {
 			A:      "- users_facts\n- accounts_facts\n- idp_facts\n",
 			Result: []string{"users_facts", "accounts_facts", "idp_facts"},
 		},
+		{
+			A:      "- users_test\n",
+			Result: []string{"users_test"},
+		},
 	}
 	for _, testCase := range testData {
 		res := splitLineConstants(testCase.A)
 		for i := 0; i < len(res); i++ {
 			if res[i] != testCase.Result[i] {
-				log.Printf("Expected %+q, got %+q\n", testCase.Result, res)
+				t.Fatalf("Expected %+q, got %+q\n", testCase.Result, res)
 			}
 		}
 	}
