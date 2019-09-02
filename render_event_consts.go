@@ -14,6 +14,7 @@ func (renderer *Renderer) Render_event_consts() ([]byte, error) {
 		constants = append(constants, namedAny.Value.Yaml)
 	}
 	f.WriteLine(`const (`)
+
 	//generate constants FactStreamType
 	if len(constants) > 0 {
 		for _, constant := range splitLineConstants(constants[0]) {
@@ -22,6 +23,7 @@ func (renderer *Renderer) Render_event_consts() ([]byte, error) {
 	}
 	f.WriteLine(`)`)
 	f.WriteLine(`const (`)
+
 	//generate constants CommandsStreamType
 	if len(constants) >= 1 {
 		for _, constant := range splitLineConstants(constants[1]) {
