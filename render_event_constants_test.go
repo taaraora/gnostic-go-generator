@@ -2,27 +2,25 @@ package main
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 )
 
 func Test_splitLineConstants(t *testing.T) {
 	testData := []struct {
-		A      string
-		name   string
-		Result []string
+		input  string
+		result []string
 		err    error
 	}{
 		{
-			A:      "- users_commands\n- accounts_commands\n- idp_commands\n",
-			name:   "",
-			Result: []string{"users_commands", "accounts_commands", "idp_commands"},
-			err:    error(nil),
+			input:  "- users_commands\n- accounts_commands\n- idp_commands\n",
+			result: []string{"users_commands", "accounts_commands", "idp_commands"},
+			err:    nil,
 		},
 		{
-			A:      "- users_facts\n- accounts_facts\n- idp_facts\n",
-			name:   "",
-			Result: []string{"users_facts", "accounts_facts", "idp_facts"},
-			err:    error(nil),
+			input:  "- users_facts\n- accounts_facts\n- idp_facts\n",
+			result: []string{"users_facts", "accounts_facts", "idp_facts"},
+			err:    nil,
 		},
 		{
 			input:  "properties:\n  code:\n    type: integer\n    format: int64\n    message:\n    type: string\n",
