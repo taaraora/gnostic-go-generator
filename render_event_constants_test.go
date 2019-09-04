@@ -25,32 +25,51 @@ func Test_splitLineConstants(t *testing.T) {
 			err:    error(nil),
 		},
 		{
-			A:      "properties:\n  code:\n    type: integer\n    format: int64\n    message:\n    type: string\n",
-			name:   "ls",
-			Result: []string{"properties:", "  code:", "    type: integer", "    format: int64", "    message:", "    type: string"},
-			err: errors.New(`Specification Extensions : ` + `ls` + `
-the specification can be expanded, for the generation of constants, only a slice of strings.
-
-example:
-         x-constants:
-           - constant_1
-           - constant_2  
-           ...`),
+			input:  "properties:\n  code:\n    type: integer\n    format: int64\n    message:\n    type: string\n",
+			result: nil,
+			err:    errors.New("can't parse yaml list"),
 		},
 	}
 	for _, testCase := range testData {
-		res, err := splitLineConstants(testCase.A, testCase.name)
-		if err != nil {
-
+		res, err := splitLineConstants(testCase.input)
+		if err != nil && err.Error() != testCase.err.Error() {
+			t.Errorf("expected :%+q:, got :%+q:", err, testCase.err)
 		}
-		for i := 0; i < len(res); i++ {
-			if res[i] != testCase.Result[i] {
-				t.Errorf("Expected %+q, got %+q\n", testCase.Result, res)
-			}
-			if err != nil && err.Error() != testCase.err.Error() {
-				t.Errorf("Expected %+v, got %+v", testCase.err.Error(), err.Error())
-			}
+		if !reflect.DeepEqual(res, testCase.result) {
+			t.Errorf("expected %+v, got %+v", res, testCase.result)
 		}
 	}
+}
 
+func Test_generateStreamTypeConstants(t *testing.T) {
+	testData := []struct {
+		input  string
+		result []string
+		err    error
+	}{
+		{
+			input:  "- users_commands\n- accounts_commands\n- idp_commands\n",
+			result: []string{"const (", "UsersCommandsStreamType = \"users_commands\"", "AccountsCommandsStreamType = \"accounts_commands\"", "IdpCommandsStreamType = \"idp_commands\"", ")"},
+			err:    nil,
+		},
+		{
+			input:  "- users_facts\n- accounts_facts\n- idp_facts\n",
+			result: []string{"const (", "UsersFactsStreamType = \"users_facts\"", "AccountsFactsStreamType = \"accounts_facts\"", "IdpFactsStreamType = \"idp_facts\"", ")"},
+			err:    nil,
+		},
+		{
+			input:  "properties:\n  code:\n    type: integer\n    format: int64\n    message:\n    type: string\n",
+			result: nil,
+			err:    errors.New("can't parse yaml list"),
+		},
+	}
+	for _, testCase := range testData {
+		res, err := generateStreamTypeConstants(testCase.input)
+		if err != nil && err.Error() != testCase.err.Error() {
+			t.Errorf("expected :%+q:, got :%+q:", err, testCase.err)
+		}
+		if !reflect.DeepEqual(res, testCase.result) {
+			t.Errorf("expected %+q, got %+q", res, testCase.result)
+		}
+	}
 }
