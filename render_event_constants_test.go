@@ -57,10 +57,6 @@ func Test_generateTypeConstants(t *testing.T) {
 		},
 	}
 	for _, testCase := range testData {
-		//res, err := generateTypeConstants(testCase.input, testCase.inputErr)
-		//if err != nil && err.Error() != testCase.resultErr.Error() {
-		//	t.Errorf("expected :%+q:, got :%+q:", err, testCase.resultErr)
-		//}
 		res := generateTypeConstants(testCase.inputTypeConstant, testCase.inputValue)
 		if !reflect.DeepEqual(res, testCase.result) {
 			t.Errorf("expected %+q, got %+q", res, testCase.result)
