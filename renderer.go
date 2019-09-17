@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	_ "os"
 	"path/filepath"
 
@@ -23,6 +24,7 @@ import (
 	surface "github.com/googleapis/gnostic/surface"
 	"golang.org/x/tools/imports"
 )
+
 
 // Renderer generates code for a surface.Model.
 type Renderer struct {
@@ -62,9 +64,12 @@ func (renderer *Renderer) Render(response *plugins.Response, files []string) (er
 		}
 		// run generated Go files through imports pkg
 		if filepath.Ext(file.Name) == ".go" {
-			file.Data, err = imports.Process(file.Name, file.Data, nil)
+			formattedFile, err := imports.Process(file.Name, file.Data, nil)
 			if err != nil {
+				log.Printf("%s", string(file.Data))
 				response.Errors = append(response.Errors, err.Error())
+			} else {
+				file.Data = formattedFile
 			}
 		}
 		response.Files = append(response.Files, file)
