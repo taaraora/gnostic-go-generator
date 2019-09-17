@@ -9,8 +9,9 @@ require (
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/tools v0.0.0-20190614205625-5aca471b1d59
 	google.golang.org/appengine v1.6.1 // indirect
-	google.golang.org/grpc v1.21.1 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )
+
+replace github.com/googleapis/gnostic => github.com/taaraora/gnostic v0.3.1-0.20190902124021-7796782c7284
 
 go 1.13
