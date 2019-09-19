@@ -16,6 +16,7 @@ package main
 
 import (
 	surface "github.com/googleapis/gnostic/surface"
+	"regexp"
 )
 
 func (renderer *Renderer) RenderTypes() ([]byte, error) {
@@ -40,7 +41,7 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 					typ = "interface{}"
 				}
 
-				f.WriteLine(field.FieldName + ` ` + typ + structTagGenerate(jsonTag(field), dbTag(field)))
+				f.WriteLine(crutch(field.FieldName) + ` ` + typ + structTagGenerate(jsonTag(field), dbTag(field)))
 			}
 			f.WriteLine(`}`)
 		} else if modelType.Kind == surface.TypeKind_OBJECT {
@@ -50,6 +51,17 @@ func (renderer *Renderer) RenderTypes() ([]byte, error) {
 		}
 	}
 	return f.Bytes(), nil
+}
+
+func crutch(crutch string) string {
+	var crutchBug[] rune;
+	for _,v := range crutch{
+		if v == 47{
+			continue
+		}
+		crutchBug = append(crutchBug, v)
+	}
+	return string(crutchBug)
 }
 
 func structTagGenerate(tags ...string) string {
@@ -71,7 +83,11 @@ func structTagGenerate(tags ...string) string {
 }
 
 func jsonTag(field *surface.Field) string {
-	if !field.Serialize || field.Name == "" {
+	//if !field.Serialize || field.Name == "" {
+	//	return ""
+	//}
+	tagOk,_:=regexp.Match("[[:digit:]]{1}", []byte(field.Name))
+	if tagOk{
 		return ""
 	}
 
